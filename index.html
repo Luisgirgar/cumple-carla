@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Asistencia</title>
+    <style>
+        :root {
+            --primary: #ff4a68;
+            --secondary: #f8f9fa;
+            --text: #333;
+            --border: #ddd;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f5f7fb; color: var(--text); padding-bottom: 40px; }
+        
+        /* Cabecera con la imagen */
+        .header-image {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .container { max-width: 600px; margin: -30px auto 0 auto; background: white; padding: 30px 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; }
+        h1 { font-size: 24px; text-align: center; margin-bottom: 10px; color: #222; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 15px; padding: 0 10px; }
+        
+        /* Formularios y campos */
+        .section-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #444; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        input[type="text"], input[type="tel"], select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; background: var(--secondary); }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background: #fff; }
+        
+        /* Bloque de niños dinámico */
+        .kid-block { background: #fff; border: 1px dashed #ccc; padding: 20px; border-radius: 12px; margin-bottom: 20px; position: relative; }
+        .kid-block h4 { margin-bottom: 15px; color: var(--primary); font-size: 15px; }
+        
+        /* Botones */
+        .btn { display: inline-block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: white; margin-top: 10px; }
+        .btn-primary:hover { background: #e03e5a; }
+        .btn-secondary { background: #e9ecef; color: #495057; margin-bottom: 20px; font-size: 14px; padding: 10px; }
+        .btn-secondary:hover { background: #dee2e6; }
+        
+        /* Alertas de envío */
+        .loading { display: none; text-align: center; font-weight: bold; color: #666; margin-top: 15px; }
+        .success-message { display: none; text-align: center; padding: 20px; background: #d4edda; color: #155724; border-radius: 8px; margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <!-- CAMBIA ESTA URL POR LA DE TU IMAGEN DE CABECERA -->
+    <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800" alt="Cabecera Cumpleaños" class="header-image">
+
+    <div class="container">
+        <h1>¡Confirmación de Asistencia! 🦄</h1>
+        <p class="subtitle">Ayúdanos a organizar la merienda ideal para el gran día. Confirma los peques que asistirán.</p>
+
+        <form id="inviteForm">
+            <!-- Datos del Adulto -->
+            <div class="section-title">Datos del Contacto</div>
+            <div class="form-group">
+                <label for="parentName">Nombre del Padre/Madre/Tutor</label>
+                <input type="text" id="parentName" required placeholder="Ej. María García">
+            </div>
+            <div class="form-group">
+                <label for="parentPhone">Teléfono de contacto</label>
+                <input type="tel" id="parentPhone" required placeholder="Ej. 600 00 00 00">
+            </div>
+
+            <!-- Sección Dinámica de Niños -->
+            <div class="section-title">Asistencia de los Peques</div>
+            <div id="kidsContainer">
+                <!-- El primer niño ya aparece por defecto -->
+                <div class="kid-block">
+                    <h4>Primer Niño/a</h4>
+                    <div class="form-group">
+                        <label>Nombre del niño/a</label>
+                        <input type="text" class="kidName" required placeholder="Nombre del peque">
+                    </div>
+                    <div class="form-group">
+                        <label>¿Qué suele merendar?</label>
+                        <select class="kidFood">
+                            <option value="Sándwich Jamón y Queso">Sándwich de Jamón y Queso</option>
+                            <option value="Sándwich de Nocilla/Nutella">Sándwich de Nocilla / Nutella</option>
+                            <option value="Mediasnoches / Brioche">Mediasnoches o Brioches variados</option>
+                            <option value="Fruta / Otros">Fruta / Prefiere otra cosa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Alergias o Intolerancias Alimentarias</label>
+                        <textarea class="kidAllergies" rows="2" placeholder="Ej. Celiaco, sin lactosa, alergia a frutos secos... (Si no tiene, dejar vacío)"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón mágico para añadir más hermanos -->
+            <button type="button" class="btn btn-secondary" id="addKidBtn">+ Añadir otro hermano/a</button>
+
+            <!-- Botón de Envío -->
+            <button type="submit" class="btn btn-primary" id="submitBtn">Enviar Confirmación</button>
+        </form>
+
+        <div class="loading" id="loadingText">Enviando respuestas, por favor espera...</div>
+        <div class="success-message" id="successText">¡Muchas gracias! Tu confirmación se ha guardado correctamente. ¡Nos vemos muy pronto! 🎉</div>
+    </div>
+
+    <script>
+        let kidCount = 1;
+        const maxKids = 5;
+        const ordinalNames = ["Primer", "Segundo", "Tercer", "Cuarto", "Quinto"];
+
+        // Función para añadir más bloques de niños
+        document.getElementById('addKidBtn').addEventListener('click', () => {
+            if (kidCount < maxKids) {
+                const container = document.getElementById('kidsContainer');
+                const newKid = document.createElement('div');
+                newKid.className = 'kid-block';
+                newKid.innerHTML = `
+                    <h4>${ordinalNames[kidCount]} Niño/a</h4>
+                    <div class="form-group">
+                        <label>Nombre del niño/a</label>
+                        <input type="text" class="kidName" required placeholder="Nombre del peque">
+                    </div>
+                    <div class="form-group">
+                        <label>¿Qué suele merendar?</label>
+                        <select class="kidFood">
+                            <option value="Sándwich Jamón y Queso">Sándwich de Jamón y Queso</option>
+                            <option value="Sándwich de Nocilla/Nutella">Sándwich de Nocilla / Nutella</option>
+                            <option value="Mediasnoches / Brioche">Mediasnoches o Brioches variados</option>
+                            <option value="Fruta / Otros">Fruta / Prefiere otra cosa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Alergias o Intolerancias Alimentarias</label>
+                        <textarea class="kidAllergies" rows="2" placeholder="Ej. Celiaco, sin lactosa..."></textarea>
+                    </div>
+                `;
+                container.appendChild(newKid);
+                kidCount++;
+            } else {
+                alert("Si necesitas añadir más de 5 niños, por favor envíalos en dos formularios separados.");
+            }
+        });
+
+        // Envío de datos a Google Sheets mediante SheetDB
+        document.getElementById('inviteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('loadingText').style.display = 'block';
+
+            const parentName = document.getElementById('parentName').value;
+            const parentPhone = document.getElementById('parentPhone').value;
+
+            const names = document.querySelectorAll('.kidName');
+            const foods = document.querySelectorAll('.kidFood');
+            const allergies = document.querySelectorAll('.kidAllergies');
+
+            // Preparamos las filas independientes para el Excel (una fila por niño, compartiendo los datos del padre)
+            let dataToSend = [];
+            for (let i = 0; i < kidCount; i++) {
+                dataToSend.push({
+                    "Fecha": new Date().toLocaleString('es-ES'),
+                    "Adulto": parentName,
+                    "Telefono": parentPhone,
+                    "Nombre_Nino": names[i].value,
+                    "Merienda_Ideal": foods[i].value,
+                    "Alergias_Intolerancias": allergies[i].value || "Ninguna"
+                });
+            }
+
+            
+          https://sheetdb.io/api/v1/puf9j158y3yt8
+
+            fetch(sheetDB_URL, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ data: dataToSend })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingText').style.display = 'none';
+                document.getElementById('successText').style.display = 'block';
+                document.getElementById('inviteForm').reset();
+            })
+            .catch(error => {
+                alert('Vaya, hubo un pequeño error al enviar. Por favor, inténtalo de nuevo.');
+                document.getElementById('submitBtn').style.display = 'block';
+                document.getElementById('loadingText').style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
